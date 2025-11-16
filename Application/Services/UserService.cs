@@ -11,23 +11,23 @@ public class UserService : IUserService
 
     public UserService(IUserRepository repo) => _repo = repo;
 
-    public async Task<UserDto?> GetUserByIdAsync(Guid id)
+    public async Task<UserDto?> GetUserByIdAsync(string id)
     {
         var user = await _repo.GetByIdAsync(id);
-        return user is null ? null : new(user.Id, user.Username, user.Email);
+        return user is null ? null : new(user.Id, user.UserName ?? string.Empty, user.Email ?? string.Empty);
     }
 
     public async Task<List<UserDto>> GetAllUsersAsync()
     {
         var users = await _repo.GetAllAsync();
-        return users.Select(u => new UserDto(u.Id, u.Username, u.Email)).ToList();
+        return users.Select(u => new UserDto(u.Id, u.UserName ?? string.Empty, u.Email ?? string.Empty)).ToList();
     }
 
     public async Task<UserDto> CreateUserAsync(string username, string email)
     {
-        var entity = new User { Id = Guid.NewGuid(), Username = username, Email = email };
+        var entity = new User { Id = Guid.NewGuid().ToString(), UserName = username, Email = email };
         await _repo.AddAsync(entity);
         await _repo.SaveChangesAsync();
-        return new(entity.Id, entity.Username, entity.Email);
+        return new(entity.Id, entity.UserName ?? string.Empty, entity.Email ?? string.Empty);
     }
 }
