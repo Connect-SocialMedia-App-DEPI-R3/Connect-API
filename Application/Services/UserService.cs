@@ -11,7 +11,7 @@ public class UserService : IUserService
 
     public UserService(IUserRepository repo) => _repo = repo;
 
-    public async Task<UserDto?> GetUserByIdAsync(string id)
+    public async Task<UserDto?> GetUserByIdAsync(Guid id)
     {
         var user = await _repo.GetByIdAsync(id);
         return user is null ? null : new(user.Id, user.UserName ?? string.Empty, user.Email ?? string.Empty);
@@ -25,7 +25,7 @@ public class UserService : IUserService
 
     public async Task<UserDto> CreateUserAsync(string username, string email)
     {
-        var entity = new User { Id = Guid.NewGuid().ToString(), UserName = username, Email = email };
+        var entity = new User { Id = Guid.NewGuid(), UserName = username, Email = email };
         await _repo.AddAsync(entity);
         await _repo.SaveChangesAsync();
         return new(entity.Id, entity.UserName ?? string.Empty, entity.Email ?? string.Empty);

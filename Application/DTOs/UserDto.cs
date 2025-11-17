@@ -1,3 +1,10 @@
 namespace Application.DTOs;
 
-public record UserDto(string Id, string Username, string Email);
+public record UserDto(Guid Id, string Username, string Email);
+public class UserRegisterDto
+{
+}
+
+public class UserLoginDto
+{
+}

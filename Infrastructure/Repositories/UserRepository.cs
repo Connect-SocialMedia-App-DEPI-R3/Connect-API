@@ -10,7 +10,7 @@ public class UserRepository : IUserRepository
     private readonly AppDbContext _context;
     public UserRepository(AppDbContext context) => _context = context;
 
-    public Task<User?> GetByIdAsync(string id) =>
+    public Task<User?> GetByIdAsync(Guid id) =>
         _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
     public Task<List<User>> GetAllAsync() =>

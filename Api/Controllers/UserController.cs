@@ -8,8 +8,13 @@ namespace Api.Controllers;
 public class UserController(IUserService service) : ControllerBase
 {
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(string id)
-        => Ok(await service.GetUserByIdAsync(id));
+    public async Task<IActionResult> Get(Guid id)
+    {
+        var user = await service.GetUserByIdAsync(id);
+        if (user is null)
+            return NotFound();
+        return Ok(user);
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
