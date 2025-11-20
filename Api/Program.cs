@@ -7,6 +7,9 @@ using Infrastructure.Repositories;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Api.Configurations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,12 +21,33 @@ builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerConfiguration();
 
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication();
-
-builder.Services.AddIdentityCore<User>()
+builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
-    .AddApiEndpoints();
+    .AddDefaultTokenProviders();
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+        )
+    };
+});
+
+
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -37,7 +61,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Services (Application)
 builder.Services.AddScoped<IUserService, UserService>();
-
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 //  CORS (Allow local development)
 builder.Services.AddCors(options =>
@@ -66,7 +91,7 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
-app.MapIdentityApi<User>();
+// app.MapIdentityApi<User>();
 
 app.MapControllers();
 

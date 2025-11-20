@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers;
 
@@ -17,6 +18,7 @@ public class UserController(IUserService service) : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAll()
         => Ok(await service.GetAllUsersAsync());
 
