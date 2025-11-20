@@ -56,8 +56,10 @@ public class AuthService : IAuthService
         );
     }
 
-    public async Task LogoutAsync()
+    public Task LogoutAsync()
     {
-        throw new NotImplementedException();
+        // JWT tokens are stateless
+        // Logout is handled client-side by removing the token
+        return Task.CompletedTask;
     }
 }

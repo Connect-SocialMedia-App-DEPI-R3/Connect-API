@@ -19,7 +19,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register([FromBody] UserRegisterDto req)
     {
         var token =  await _authService.RegisterAsync(req);
-        return Ok(new { Token = token });
+        return Ok(token);
     }
 
     [HttpPost("login")]
@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
         var token = await _authService.LoginAsync(req);
         if (token is null)
             return Unauthorized();
-        return Ok(new { Token = token });
+        return Ok(token);
     }
 
 }
