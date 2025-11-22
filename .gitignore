@@ -484,3 +484,4 @@ $RECYCLE.BIN/
 *.swp
 Api/appsettings.json
 Infrastructure/Data/AppDbContextFactory.cs
+Infrastructure/Data/SqlServerDbContextFactory.cs
