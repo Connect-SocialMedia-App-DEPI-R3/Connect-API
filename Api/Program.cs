@@ -58,11 +58,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Repositories (Infrastructure)
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
 
 // Services (Application)
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IImageService, LocalImageService>();
 
 //  CORS (Allow local development)
 builder.Services.AddCors(options =>
@@ -86,6 +89,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable static files for serving uploaded images
+app.UseStaticFiles();
 
 app.UseCors("AllowFrontend");
 
