@@ -51,7 +51,7 @@ builder.Services.AddAuthentication(options =>
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection")));
 
 
 // Dependency Injection
@@ -81,7 +81,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     // app.UseSwagger();
     // app.UseSwaggerUI();
