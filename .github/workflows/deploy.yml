@@ -31,8 +31,7 @@ jobs:
             --configuration Release `
             --runtime win-x86 `
             --self-contained false `
-            --output ./publish `
-            /p:EnvironmentName=Production
+            --output ./publish 
 
       - name: Upload via FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.0

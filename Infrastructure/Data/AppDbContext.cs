@@ -20,6 +20,10 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.UserName)
+            .IsUnique();
+
         modelBuilder.Entity<Follow>()
             .HasOne(f => f.Follower)
             .WithMany(u => u.Following)

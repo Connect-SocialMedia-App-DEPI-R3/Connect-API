@@ -22,9 +22,9 @@ public class UserController(IUserService service) : ControllerBase
     public async Task<IActionResult> GetAll()
         => Ok(await service.GetAllUsersAsync());
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateUserRequest req)
-        => Ok(await service.CreateUserAsync(req.Username, req.Email));
+    // [HttpPost]
+    // public async Task<IActionResult> Create([FromBody] CreateUserRequest req)
+    //     => Ok(await service.CreateUserAsync(req.Username, req.Email));
 }
 
 public record CreateUserRequest(string Username, string Email);
