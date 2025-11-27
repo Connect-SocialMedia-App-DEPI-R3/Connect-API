@@ -485,3 +485,5 @@ $RECYCLE.BIN/
 Api/appsettings.json
 Infrastructure/Data/AppDbContextFactory.cs
 Infrastructure/Data/SqlServerDbContextFactory.cs
+
+Frontend/

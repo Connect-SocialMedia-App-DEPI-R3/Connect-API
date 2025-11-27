@@ -26,7 +26,7 @@ public class PostController : ControllerBase
     }
 
     // GET: api/posts/{id}
-    [HttpGet("{id}")]
+    [HttpGet("{id:Guid}")]
     public async Task<ActionResult<PostDetailedViewDto>> GetPostById(Guid id)
     {
         var post = await _postService.GetPostByIdAsync(id);
