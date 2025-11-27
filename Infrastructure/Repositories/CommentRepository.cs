@@ -20,9 +20,9 @@ public class CommentRepository : ICommentRepository
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public Task<List<Comment>> GetAllByPostIdAsync(Guid postId)
+    public async Task<List<Comment>> GetAllByPostIdAsync(Guid postId)
     {
-        return _context.Comments
+        return await _context.Comments
             .Include(c => c.User)
             .Where(c => c.PostId == postId)
             .OrderByDescending(c => c.CreatedAt)
@@ -41,14 +41,16 @@ public class CommentRepository : ICommentRepository
         await _context.Comments.AddAsync(comment);
     }
 
-    public async Task UpdateAsync(Comment comment)
+    public Task UpdateAsync(Comment comment)
     {
         _context.Comments.Update(comment);
+        return Task.CompletedTask;
     }
 
-    public async Task DeleteAsync(Comment comment)
+    public Task DeleteAsync(Comment comment)
     {
         _context.Comments.Remove(comment);
+        return Task.CompletedTask;
     }
 
     public async Task SaveChangesAsync()

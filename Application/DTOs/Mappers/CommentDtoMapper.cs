@@ -10,8 +10,10 @@ public static class CommentDtoMapper
         return new CommentDto
         {
             Id = comment.Id,
+            PostId = comment.PostId,
             Content = comment.Content,
             CreatedAt = comment.CreatedAt,
+            UpdatedAt = comment.UpdatedAt,
             Author = comment.User.ToUserDto()
         };
     }
@@ -24,12 +26,14 @@ public static class CommentDtoMapper
             Content = createDto.Content,
             PostId = postId,
             UserId = userId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
     }
 
     public static void UpdateEntity(this CommentUpdateDto updateDto, Comment comment)
     {
         comment.Content = updateDto.Content;
+        comment.UpdatedAt = DateTime.UtcNow;
     }
 }

@@ -34,6 +34,9 @@ public class CommentController : ControllerBase
         if (comment is null)
             return NotFound(new { message = "Comment not found" });
 
+        if (comment.PostId != postId)
+            return BadRequest(new { message = "Comment does not belong to the specified post" });
+
         return Ok(comment);
     }
 
