@@ -1,3 +1,4 @@
+using Api.Filters;
 using Application.DTOs;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -31,10 +32,7 @@ public class CommentController : ControllerBase
     {
         var comment = await _commentService.GetCommentByIdAsync(id);
 
-        if (comment is null)
-            return NotFound(new { message = "Comment not found" });
-
-        if (comment.PostId != postId)
+        if (comment!.PostId != postId)
             return BadRequest(new { message = "Comment does not belong to the specified post" });
 
         return Ok(comment);
@@ -43,77 +41,36 @@ public class CommentController : ControllerBase
     // POST: api/posts/{postId}/comments
     [Authorize]
     [HttpPost]
+    [ExtractUserId]
     public async Task<ActionResult<CommentDto>> CreateComment(Guid postId, [FromBody] CommentCreateDto commentCreateDto)
     {
-        var userId = GetUserIdFromClaims();
+        var userId = (Guid)HttpContext.Items["UserId"]!;
 
-        if (userId == Guid.Empty)
-            return Unauthorized(new { message = "Invalid user credentials" });
-
-        try
-        {
-            var comment = await _commentService.CreateCommentAsync(commentCreateDto, postId, userId);
-            return CreatedAtAction(nameof(GetCommentById), new { postId, id = comment.Id }, comment);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
+        var comment = await _commentService.CreateCommentAsync(commentCreateDto, postId, userId);
+        return CreatedAtAction(nameof(GetCommentById), new { postId, id = comment.Id }, comment);
     }
 
     // PUT: api/posts/{postId}/comments/{id}
     [Authorize]
     [HttpPut("{id}")]
+    [ExtractUserId]
     public async Task<ActionResult<CommentDto>> UpdateComment(Guid postId, Guid id, [FromBody] CommentUpdateDto commentUpdateDto)
     {
-        var userId = GetUserIdFromClaims();
+        var userId = (Guid)HttpContext.Items["UserId"]!;
 
-        if (userId == Guid.Empty)
-            return Unauthorized(new { message = "Invalid user credentials" });
-
-        try
-        {
-            var comment = await _commentService.UpdateCommentAsync(id, commentUpdateDto, userId);
-
-            if (comment is null)
-                return NotFound(new { message = "Comment not found" });
-
-            return Ok(comment);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
+        var comment = await _commentService.UpdateCommentAsync(id, commentUpdateDto, userId);
+        return Ok(comment);
     }
 
     // DELETE: api/posts/{postId}/comments/{id}
     [Authorize]
     [HttpDelete("{id}")]
+    [ExtractUserId]
     public async Task<ActionResult> DeleteComment(Guid postId, Guid id)
     {
-        var userId = GetUserIdFromClaims();
+        var userId = (Guid)HttpContext.Items["UserId"]!;
 
-        if (userId == Guid.Empty)
-            return Unauthorized(new { message = "Invalid user credentials" });
-
-        try
-        {
-            var result = await _commentService.DeleteCommentAsync(id, userId);
-
-            if (!result)
-                return NotFound(new { message = "Comment not found" });
-
-            return NoContent();
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
-    }
-
-    private Guid GetUserIdFromClaims()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
+        await _commentService.DeleteCommentAsync(id, userId);
+        return NoContent();
     }
 }

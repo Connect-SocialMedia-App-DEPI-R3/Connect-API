@@ -1,7 +1,6 @@
 using Application.DTOs;
 using Application.DTOs.Mappers;
 using Application.Interfaces;
-using Domain.Entities;
 using Domain.Interfaces;
 
 namespace Application.Services;
@@ -20,7 +19,9 @@ public class CommentService : ICommentService
     public async Task<CommentDto?> GetCommentByIdAsync(Guid id)
     {
         var comment = await _commentRepository.GetByIdAsync(id);
-        return comment?.ToCommentDto();
+        if (comment is null)
+            throw new KeyNotFoundException($"Comment with ID {id} not found.");
+        return comment.ToCommentDto();
     }
 
     public async Task<List<CommentDto>> GetAllCommentsAsync()
@@ -47,8 +48,7 @@ public class CommentService : ICommentService
         await _commentRepository.AddAsync(comment);
         await _commentRepository.SaveChangesAsync();
 
-        var createdComment = await _commentRepository.GetByIdAsync(comment.Id);
-        return createdComment!.ToCommentDto();
+        return comment!.ToCommentDto();
     }
 
     public async Task<CommentDto?> UpdateCommentAsync(Guid id, CommentUpdateDto updateDto, Guid userId)
@@ -56,7 +56,7 @@ public class CommentService : ICommentService
         var comment = await _commentRepository.GetByIdAsync(id);
 
         if (comment is null)
-            return null;
+            throw new KeyNotFoundException($"Comment with ID {id} not found.");
 
         // Check ownership
         if (comment.UserId != userId)
@@ -67,8 +67,7 @@ public class CommentService : ICommentService
         await _commentRepository.UpdateAsync(comment);
         await _commentRepository.SaveChangesAsync();
 
-        var updatedComment = await _commentRepository.GetByIdAsync(id);
-        return updatedComment?.ToCommentDto();
+        return comment.ToCommentDto();
     }
 
     public async Task<bool> DeleteCommentAsync(Guid id, Guid userId)
@@ -76,7 +75,7 @@ public class CommentService : ICommentService
         var comment = await _commentRepository.GetByIdAsync(id);
 
         if (comment is null)
-            return false;
+            throw new KeyNotFoundException($"Comment with ID {id} not found.");
 
         // Check ownership
         if (comment.UserId != userId)
