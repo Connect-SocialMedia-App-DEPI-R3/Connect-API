@@ -8,6 +8,8 @@ public class User : IdentityUser<Guid>
     public string? Bio { get; set; } = null!;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedAt { get; set; }
 
     // Posts
     public List<Post>? Posts { get; set; } = new List<Post>();

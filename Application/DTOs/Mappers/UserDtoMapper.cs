@@ -10,7 +10,8 @@ public static class UserDtoMapper
         return new UserDto(
             user.Id,
             user.UserName ?? string.Empty,
-            user.Email ?? string.Empty
+            user.Email ?? string.Empty,
+            user.AvatarUrl
         );
     }
 }
