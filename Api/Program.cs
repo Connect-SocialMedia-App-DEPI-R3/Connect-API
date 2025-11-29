@@ -1,15 +1,12 @@
-using Microsoft.EntityFrameworkCore;
-using Application.Interfaces;
-using Application.Services;
-using Domain.Interfaces;
 using Infrastructure.Data;
-using Infrastructure.Repositories;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Api.Configurations;
+using Api.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Api.Middleware;
+using Api.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,25 +46,15 @@ builder.Services.AddAuthentication(options =>
 
 
 
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection")));
-
-
-// Dependency Injection
-
+// Dependency Injection (AppDbContext)
 // Repositories (Infrastructure)
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IPostRepository, PostRepository>();
-builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // Services (Application)
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ITokenService, JwtTokenService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IPostService, PostService>();
-builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<IImageService, LocalImageService>();
+builder.Services.AddApplication();
+
+// Filters
+builder.Services.AddScoped<ExtractUserIdFilter>();
 
 //  CORS (Allow local development)
 builder.Services.AddCors(options =>
@@ -90,17 +77,13 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwaggerConfiguration();
 }
 
+app.UseGlobalExceptionHandler();
+
 app.UseHttpsRedirection();
-
-// Enable static files for serving uploaded images
 app.UseStaticFiles();
-
 app.UseCors("AllowFrontend");
-
+app.UseAuthentication();
 app.UseAuthorization();
-
-// app.MapIdentityApi<User>();
-
 app.MapControllers();
 
 app.Run();
