@@ -65,7 +65,7 @@ public class UserService : IUserService
         }
 
         // change full name
-        if (updateDto.FullName is not null && updateDto.FullName != user.FullName)
+        if (!string.IsNullOrWhiteSpace(updateDto.FullName))
             user.FullName = updateDto.FullName;
 
         // change bio
