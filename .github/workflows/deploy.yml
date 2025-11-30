@@ -44,4 +44,4 @@ jobs:
           exclude: |
             **/wwwroot/**
             wwwroot/**
-          dangerous-clean-slate: true
+        #   dangerous-clean-slate: true
