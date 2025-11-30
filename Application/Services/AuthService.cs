@@ -1,4 +1,5 @@
 using Application.DTOs;
+using Application.DTOs.Mappers;
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -36,11 +37,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto?> RegisterAsync(UserRegisterDto registerDto)
     {
-        var user = new User
-        {
-            Email = registerDto.Email,
-            UserName = registerDto.Username
-        };
+        var user = registerDto.ToEntity();
 
         var result = await _userManager.CreateAsync(user, registerDto.Password);
 
