@@ -4,8 +4,9 @@ namespace Domain.Entities;
 
 public class User : IdentityUser<Guid>
 {
-    public string? AvatarUrl { get; set; } = null!;
-    public string? Bio { get; set; } = null!;
+    public string? FullName { get; set; } = string.Empty;
+    public string? AvatarUrl { get; set; } = string.Empty;
+    public string? Bio { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public bool IsDeleted { get; set; } = false;
