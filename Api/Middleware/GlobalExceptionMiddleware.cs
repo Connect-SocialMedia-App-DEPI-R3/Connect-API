@@ -38,7 +38,7 @@ public class GlobalExceptionMiddleware
     {
         context.Response.ContentType = "application/json";
 
-        var (statusCode, message) = exception switch
+        var (statusCode, error) = exception switch
         {
             UnauthorizedAccessException => (403, "You don't have permission to access this resource"),
             KeyNotFoundException => (404, exception.Message),
@@ -52,8 +52,8 @@ public class GlobalExceptionMiddleware
         var response = new
         {
             statusCode,
-            message,
-            error = exception.Message,
+            message = exception.Message,
+            error,
             // Only include detailed error in development
             stackTrace = _env.IsDevelopment() ? exception.StackTrace : null
         };

@@ -11,13 +11,23 @@ public class UserRepository : IUserRepository
     public UserRepository(AppDbContext context) => _context = context;
 
     public Task<User?> GetByIdAsync(Guid id) =>
-        _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        _context.Users.FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
+
+    public Task<User?> GetByUsernameAsync(string username) =>
+        _context.Users.FirstOrDefaultAsync(u => u.UserName == username && !u.IsDeleted);
 
     public Task<List<User>> GetAllAsync() =>
-        _context.Users.ToListAsync();
+        _context.Users.Where(u => !u.IsDeleted).ToListAsync();
 
     public async Task AddAsync(User user) =>
         await _context.Users.AddAsync(user);
+
+    public Task UpdateAsync(User user)
+    {
+        user.UpdatedAt = DateTime.UtcNow;
+        _context.Users.Update(user);
+        return Task.CompletedTask;
+    }
 
     public Task SaveChangesAsync() =>
         _context.SaveChangesAsync();
