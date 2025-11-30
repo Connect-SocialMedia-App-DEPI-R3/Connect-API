@@ -29,12 +29,11 @@ public class PostCreateDto
 {
     public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
-    public string? ImageUrl { get; set; }
 }
 
 public class PostUpdateDto
 {
     public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
-    public string? ImageUrl { get; set; }
+    public bool RemoveImage { get; set; } = false;
 }

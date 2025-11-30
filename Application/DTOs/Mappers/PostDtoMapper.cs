@@ -43,7 +43,6 @@ public static class PostDtoMapper
             Id = Guid.NewGuid(),
             Title = postCreateDto.Title,
             Content = postCreateDto.Content,
-            ImageUrl = postCreateDto.ImageUrl,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             UserId = userId
@@ -54,7 +53,6 @@ public static class PostDtoMapper
     {
         post.Title = postUpdateDto.Title;
         post.Content = postUpdateDto.Content;
-        post.ImageUrl = postUpdateDto.ImageUrl;
         post.UpdatedAt = DateTime.UtcNow;
     }
 

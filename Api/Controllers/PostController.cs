@@ -2,7 +2,7 @@ using Application.DTOs;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Api.Filters;
 
 namespace Api.Controllers;
 
@@ -11,10 +11,12 @@ namespace Api.Controllers;
 public class PostController : ControllerBase
 {
     private readonly IPostService _postService;
+    private readonly IImageService _imageService;
 
-    public PostController(IPostService postService)
+    public PostController(IPostService postService, IImageService imageService)
     {
         _postService = postService;
+        _imageService = imageService;
     }
 
     // GET: api/posts
@@ -40,70 +42,59 @@ public class PostController : ControllerBase
     // POST: api/posts
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<PostDetailedViewDto>> CreatePost([FromBody] PostCreateDto postCreateDto)
+    [ExtractUserId]
+    public async Task<ActionResult<PostDetailedViewDto>> CreatePost([FromForm] PostCreateDto postCreateDto, IFormFile? file)
     {
-        var userId = GetUserIdFromClaims();
-        
-        if (userId == Guid.Empty)
-            return Unauthorized(new { message = "Invalid user credentials" });
+        var userId = (Guid)HttpContext.Items["UserId"]!;
 
-        var post = await _postService.CreatePostAsync(postCreateDto, userId);
+        string? imageUrl = null;
+        if (file != null && file.Length > 0)
+        {
+            using var stream = file.OpenReadStream();
+            imageUrl = await _imageService.UploadImageAsync(stream, file.FileName, file.ContentType);
+        }
+
+        var post = await _postService.CreatePostAsync(postCreateDto, userId, imageUrl);
         return CreatedAtAction(nameof(GetPostById), new { id = post.Id }, post);
     }
 
     // PUT: api/posts/{id}
     [Authorize]
     [HttpPut("{id}")]
-    public async Task<ActionResult<PostDetailedViewDto>> UpdatePost(Guid id, [FromBody] PostUpdateDto postUpdateDto)
+    [ExtractUserId]
+    public async Task<ActionResult<PostDetailedViewDto>> UpdatePost(Guid id, [FromForm] PostUpdateDto postUpdateDto, IFormFile? file)
     {
-        var userId = GetUserIdFromClaims();
+        var userId = (Guid)HttpContext.Items["UserId"]!;
+
+        string? imageUrl = null;
+        if (file != null && file.Length > 0)
+        {
+            using var stream = file.OpenReadStream();
+            imageUrl = await _imageService.UploadImageAsync(stream, file.FileName, file.ContentType);
+        }
+        // If file is null, imageUrl stays null and service won't update the image
+
+        var post = await _postService.UpdatePostAsync(id, postUpdateDto, userId, imageUrl);
         
-        if (userId == Guid.Empty)
-            return Unauthorized(new { message = "Invalid user credentials" });
+        if (post is null)
+            return NotFound(new { message = "Post not found" });
 
-        try
-        {
-            var post = await _postService.UpdatePostAsync(id, postUpdateDto, userId);
-            
-            if (post is null)
-                return NotFound(new { message = "Post not found" });
-
-            return Ok(post);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
+        return Ok(post);
     }
 
     // DELETE: api/posts/{id}
     [Authorize]
     [HttpDelete("{id}")]
+    [ExtractUserId]
     public async Task<ActionResult> DeletePost(Guid id)
     {
-        var userId = GetUserIdFromClaims();
+        var userId = (Guid)HttpContext.Items["UserId"]!;
+
+        var result = await _postService.DeletePostAsync(id, userId);
         
-        if (userId == Guid.Empty)
-            return Unauthorized(new { message = "Invalid user credentials" });
+        if (!result)
+            return NotFound(new { message = "Post not found" });
 
-        try
-        {
-            var result = await _postService.DeletePostAsync(id, userId);
-            
-            if (!result)
-                return NotFound(new { message = "Post not found" });
-
-            return NoContent();
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
-    }
-
-    private Guid GetUserIdFromClaims()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
+        return NoContent();
     }
 }
