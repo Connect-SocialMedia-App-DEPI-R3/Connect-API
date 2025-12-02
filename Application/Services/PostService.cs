@@ -29,6 +29,12 @@ public class PostService : IPostService
         return posts.Select(post => post.ToPostSimpleViewDto()).ToList();
     }
 
+    public async Task<List<PostSimpleViewDto>> GetPostsByUsernameAsync(string username)
+    {
+        var posts = await _postRepository.GetByUsernameAsync(username);
+        return posts.Select(post => post.ToPostSimpleViewDto()).ToList();
+    }
+
     public async Task<PostDetailedViewDto> CreatePostAsync(PostCreateDto postCreateDto, Guid userId, string? imageUrl)
     {
         var post = postCreateDto.ToEntity(userId);

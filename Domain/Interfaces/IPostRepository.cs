@@ -6,6 +6,7 @@ public interface IPostRepository
 {
     Task<Post?> GetByIdAsync(Guid id);
     Task<List<Post>> GetAllAsync();
+    Task<List<Post>> GetByUsernameAsync(string username);
     Task AddAsync(Post post);
     Task UpdateAsync(Post post);
     Task DeleteAsync(Post post);

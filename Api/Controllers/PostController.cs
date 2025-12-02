@@ -75,11 +75,19 @@ public class PostController : ControllerBase
         // If file is null, imageUrl stays null and service won't update the image
 
         var post = await _postService.UpdatePostAsync(id, postUpdateDto, userId, imageUrl);
-        
+
         if (post is null)
             return NotFound(new { message = "Post not found" });
 
         return Ok(post);
+    }
+    
+    // GET: api/posts/u/{username}
+    [HttpGet("u/{username}")]
+    public async Task<ActionResult<List<PostSimpleViewDto>>> GetPostsByUsername(string username)
+    {
+        var posts = await _postService.GetPostsByUsernameAsync(username);
+        return Ok(posts);
     }
 
     // DELETE: api/posts/{id}

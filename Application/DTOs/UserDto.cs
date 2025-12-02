@@ -43,6 +43,7 @@ public class UserProfileDto
     public string? Bio { get; set; }
     public int FollowerCount { get; set; }
     public int FollowingCount { get; set; }
+    public int PostCount { get; set; }
     public string? AvatarUrl { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

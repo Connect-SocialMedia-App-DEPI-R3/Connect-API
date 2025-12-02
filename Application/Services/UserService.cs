@@ -40,7 +40,7 @@ public class UserService : IUserService
 
     public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
     {
-        var user = await _repo.GetByIdAsync(userId);
+        var user = await _repo.GetByIdWithRelationsAsync(userId);
         if (user is null)
             throw new KeyNotFoundException($"User with ID {userId} not found.");
 

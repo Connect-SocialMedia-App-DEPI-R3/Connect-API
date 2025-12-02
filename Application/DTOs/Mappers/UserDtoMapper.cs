@@ -26,6 +26,7 @@ public static class UserDtoMapper
             Bio = user.Bio,
             FollowerCount = user.Followers?.Count ?? 0,
             FollowingCount = user.Following?.Count ?? 0,
+            PostCount = user.Posts?.Count ?? 0,
             AvatarUrl = user.AvatarUrl,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt

@@ -24,6 +24,15 @@ public class PostRepository : IPostRepository
             .Include(p => p.Reactions)
             .ToListAsync();
 
+    public Task<List<Post>> GetByUsernameAsync(string username) =>
+        _context.Posts
+            .Include(p => p.User)
+            .Include(p => p.Comments)
+            .Include(p => p.Reactions)
+            .Where(p => p.User.UserName == username && !p.User.IsDeleted)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+
     public async Task AddAsync(Post post) =>
         await _context.Posts.AddAsync(post);
 

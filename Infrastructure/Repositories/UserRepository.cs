@@ -13,8 +13,25 @@ public class UserRepository : IUserRepository
     public Task<User?> GetByIdAsync(Guid id) =>
         _context.Users.FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
 
+    public Task<User?> GetByIdWithRelationsAsync(Guid id) =>
+        _context.Users
+            .Include(u => u.Posts)
+            .Include(u => u.Followers)
+            .Include(u => u.Following)
+            .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
+
+    public Task<User?> GetByIdIncludingDeletedAsync(Guid id) =>
+        _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
     public Task<User?> GetByUsernameAsync(string username) =>
         _context.Users.FirstOrDefaultAsync(u => u.UserName == username && !u.IsDeleted);
+
+    public Task<User?> GetByUsernameWithRelationsAsync(string username) =>
+        _context.Users
+            .Include(u => u.Posts)
+            .Include(u => u.Followers)
+            .Include(u => u.Following)
+            .FirstOrDefaultAsync(u => u.UserName == username && !u.IsDeleted);
 
     public Task<List<User>> GetAllAsync() =>
         _context.Users.Where(u => !u.IsDeleted).ToListAsync();
