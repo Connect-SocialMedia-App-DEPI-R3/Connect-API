@@ -18,7 +18,10 @@ builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerConfiguration();
 
-builder.Services.AddIdentity<User, IdentityRole<Guid>>()
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+})
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -55,6 +58,7 @@ builder.Services.AddApplication();
 
 // Filters
 builder.Services.AddScoped<ExtractUserIdFilter>();
+builder.Services.AddScoped<ValidateUserNotDeletedFilter>();
 
 //  CORS (Allow local development)
 builder.Services.AddCors(options =>
