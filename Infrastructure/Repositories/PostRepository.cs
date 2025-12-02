@@ -29,7 +29,7 @@ public class PostRepository : IPostRepository
             .Include(p => p.User)
             .Include(p => p.Comments)
             .Include(p => p.Reactions)
-            .Where(p => p.User.UserName == username && !p.User.IsDeleted)
+            .Where(p => p.User.UserName == username)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
 

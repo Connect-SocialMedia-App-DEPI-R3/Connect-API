@@ -70,7 +70,7 @@ public class ProfileController : ControllerBase
     public async Task<ActionResult> DeleteAccount()
     {
         var userId = (Guid)HttpContext.Items["UserId"]!;
-        await _userService.SoftDeleteUserAsync(userId);
+        await _userService.DeleteUserAsync(userId);
         
         return Ok(new { message = "Account deleted successfully" });
     }

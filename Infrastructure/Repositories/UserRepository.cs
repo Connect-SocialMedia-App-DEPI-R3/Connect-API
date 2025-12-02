@@ -11,30 +11,27 @@ public class UserRepository : IUserRepository
     public UserRepository(AppDbContext context) => _context = context;
 
     public Task<User?> GetByIdAsync(Guid id) =>
-        _context.Users.FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
+        _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
     public Task<User?> GetByIdWithRelationsAsync(Guid id) =>
         _context.Users
             .Include(u => u.Posts)
             .Include(u => u.Followers)
             .Include(u => u.Following)
-            .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
-
-    public Task<User?> GetByIdIncludingDeletedAsync(Guid id) =>
-        _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            .FirstOrDefaultAsync(u => u.Id == id);
 
     public Task<User?> GetByUsernameAsync(string username) =>
-        _context.Users.FirstOrDefaultAsync(u => u.UserName == username && !u.IsDeleted);
+        _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
 
     public Task<User?> GetByUsernameWithRelationsAsync(string username) =>
         _context.Users
             .Include(u => u.Posts)
             .Include(u => u.Followers)
             .Include(u => u.Following)
-            .FirstOrDefaultAsync(u => u.UserName == username && !u.IsDeleted);
+            .FirstOrDefaultAsync(u => u.UserName == username);
 
     public Task<List<User>> GetAllAsync() =>
-        _context.Users.Where(u => !u.IsDeleted).ToListAsync();
+        _context.Users.ToListAsync();
 
     public async Task AddAsync(User user) =>
         await _context.Users.AddAsync(user);

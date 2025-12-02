@@ -3,6 +3,7 @@ using Application.DTOs.Mappers;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace Application.Services;
@@ -11,11 +12,13 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _repo;
     private readonly IImageService _imageService;
+    private readonly UserManager<User> _userManager;
 
-    public UserService(IUserRepository repo, IImageService imageService)
+    public UserService(IUserRepository repo, IImageService imageService, UserManager<User> userManager)
     {
         _repo = repo;
         _imageService = imageService;
+        _userManager = userManager;
     }
 
     public async Task<UserDto?> GetUserByIdAsync(Guid id)
@@ -99,17 +102,24 @@ public class UserService : IUserService
         return avatarUrl;
     }
 
-    public async Task<bool> SoftDeleteUserAsync(Guid userId)
+    public async Task<bool> DeleteUserAsync(Guid userId)
     {
         var user = await _repo.GetByIdAsync(userId);
         if (user is null)
             throw new KeyNotFoundException($"User with ID {userId} not found.");
 
-        user.IsDeleted = true;
-        user.DeletedAt = DateTime.UtcNow;
+        // delete user avatar if exists
+        if (!string.IsNullOrEmpty(user.AvatarUrl))
+        {
+            await _imageService.DeleteImageAsync(user.AvatarUrl);
+        }
 
-        await _repo.UpdateAsync(user);
-        await _repo.SaveChangesAsync();
+        // Use UserManager to safely delete Identity user (handles AspNetUserRoles, AspNetUserClaims, etc.)
+        var result = await _userManager.DeleteAsync(user);
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to delete user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
 
         return true;
     }

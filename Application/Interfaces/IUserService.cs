@@ -10,5 +10,5 @@ public interface IUserService
     Task<UserProfileDto> GetUserProfileAsync(Guid userId);
     Task<UserProfileDto> UpdateUserProfileAsync(Guid userId, UserUpdateProfileDto updateDto);
     Task<string> UpdateUserAvatarAsync(Guid userId, string avatarUrl);
-    Task<bool> SoftDeleteUserAsync(Guid userId);
+    Task<bool> DeleteUserAsync(Guid userId);
 }
