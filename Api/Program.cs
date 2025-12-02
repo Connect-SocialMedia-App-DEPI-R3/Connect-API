@@ -58,7 +58,7 @@ builder.Services.AddApplication();
 
 // Filters
 builder.Services.AddScoped<ExtractUserIdFilter>();
-builder.Services.AddScoped<ValidateUserNotDeletedFilter>();
+// builder.Services.AddScoped<ValidateUserNotDeletedFilter>();
 
 //  CORS (Allow local development)
 builder.Services.AddCors(options =>
