@@ -91,4 +91,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// seed database
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var context = services.GetRequiredService<AppDbContext>();
+
+    await DbInitializer.SeedAsync(userManager, roleManager, context);
+}
 app.Run();
