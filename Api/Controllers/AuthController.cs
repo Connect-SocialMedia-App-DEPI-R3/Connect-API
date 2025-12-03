@@ -1,3 +1,4 @@
+using Api.Filters;
 using Application.DTOs;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
+    [ValidateModelFilter]
     public async Task<IActionResult> Register([FromBody] UserRegisterDto req)
     {
         var token =  await _authService.RegisterAsync(req);

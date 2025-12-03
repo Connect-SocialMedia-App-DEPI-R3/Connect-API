@@ -34,3 +34,10 @@ public class ValidateModelFilter : IActionFilter
         // Can log successful actions here
     }
 }
+
+public class ValidateModelFilterAttribute : ServiceFilterAttribute
+{
+    public ValidateModelFilterAttribute() : base(typeof(ValidateModelFilter))
+    {
+    }
+}
