@@ -22,6 +22,7 @@ public class PostRepository : IPostRepository
             .Include(p => p.User)
             .Include(p => p.Comments)
             .Include(p => p.Reactions)
+            .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
 
     public Task<List<Post>> GetByUsernameAsync(string username) =>
@@ -29,7 +30,7 @@ public class PostRepository : IPostRepository
             .Include(p => p.User)
             .Include(p => p.Comments)
             .Include(p => p.Reactions)
-            .Where(p => p.User.UserName == username)
+            .Where(p => p.User.NormalizedUserName == username.ToUpper())
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
 

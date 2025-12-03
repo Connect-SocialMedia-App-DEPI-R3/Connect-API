@@ -103,6 +103,6 @@ public class PostController : ControllerBase
         if (!result)
             return NotFound(new { message = "Post not found" });
 
-        return NoContent();
+        return Ok(new { message = "Post deleted successfully" });
     }
 }
