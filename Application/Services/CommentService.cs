@@ -43,6 +43,9 @@ public class CommentService : ICommentService
         if (post is null)
             throw new KeyNotFoundException($"Post with ID {postId} not found.");
 
+        if (string.IsNullOrWhiteSpace(createCommentDto.Content))
+            throw new ArgumentException("Comment content cannot be empty.");
+
         var comment = createCommentDto.ToEntity(postId, userId);
 
         await _commentRepository.AddAsync(comment);
@@ -60,7 +63,11 @@ public class CommentService : ICommentService
 
         // Check ownership
         if (comment.UserId != userId)
-            throw new UnauthorizedAccessException("You are not authorized to update this comment.");
+            throw new UnauthorizedAccessException("You don't own this comment to update.");
+
+            
+        if (string.IsNullOrWhiteSpace(updateDto.Content))
+            throw new ArgumentException("Comment content cannot be empty.");
 
         updateDto.UpdateEntity(comment);
 
@@ -79,7 +86,7 @@ public class CommentService : ICommentService
 
         // Check ownership
         if (comment.UserId != userId)
-            throw new UnauthorizedAccessException("You are not authorized to delete this comment.");
+            throw new UnauthorizedAccessException("You don't own this comment to delete.");
 
         await _commentRepository.DeleteAsync(comment);
         await _commentRepository.SaveChangesAsync();

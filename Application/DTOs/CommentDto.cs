@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Application.DTOs;
 
 public class CommentDto
@@ -12,10 +14,16 @@ public class CommentDto
 
 public class CommentCreateDto
 {
+    [Required]
+    [MinLength(1, ErrorMessage = "Comment cannot be empty.")]
+    [MaxLength(500, ErrorMessage = "Comment cannot exceed 500 characters.")]
     public string Content { get; set; } = string.Empty;
 }
 
 public class CommentUpdateDto
 {
+    [Required]
+    [MinLength(1, ErrorMessage = "Comment cannot be empty.")]
+    [MaxLength(500, ErrorMessage = "Comment cannot exceed 500 characters.")]
     public string Content { get; set; } = string.Empty;
 }
