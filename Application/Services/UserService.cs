@@ -12,12 +12,14 @@ namespace Application.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _repo;
+    private readonly IFollowRepository _followRepo;
     private readonly IImageService _imageService;
     private readonly UserManager<User> _userManager;
 
-    public UserService(IUserRepository repo, IImageService imageService, UserManager<User> userManager)
+    public UserService(IUserRepository repo, IFollowRepository followRepo, IImageService imageService, UserManager<User> userManager)
     {
         _repo = repo;
+        _followRepo = followRepo;
         _imageService = imageService;
         _userManager = userManager;
     }
@@ -123,5 +125,70 @@ public class UserService : IUserService
         }
 
         return true;
+    }
+
+    public async Task<bool> ToggleFollowAsync(Guid followerId, string targetUsername)
+    {
+        // Make sure target user exists
+        var targetUser = await _repo.GetByUsernameAsync(targetUsername);
+        if (targetUser is null)
+            throw new KeyNotFoundException($"User '{targetUsername}' not found");
+
+        // Can't follow yourself
+        if (followerId == targetUser.Id)
+            throw new InvalidOperationException("You cannot follow yourself");
+
+        // Check if already following
+        var existingFollow = await _followRepo.GetFollowAsync(followerId, targetUser.Id);
+        
+        if (existingFollow is not null)
+        {
+            // Already following - unfollow
+            await _followRepo.DeleteAsync(existingFollow);
+            await _followRepo.SaveChangesAsync();
+            return false; // Unfollowed
+        }
+        else
+        {
+            // Not following - follow
+            var follow = new Follow
+            {
+                Id = Guid.NewGuid(),
+                FollowerId = followerId,
+                FollowingId = targetUser.Id
+            };
+            await _followRepo.AddAsync(follow);
+            await _followRepo.SaveChangesAsync();
+            return true; // Now following
+        }
+    }
+
+    public async Task<List<UserDto>> GetFollowersAsync(string username)
+    {
+        var user = await _repo.GetByUsernameAsync(username);
+        if (user is null)
+            throw new KeyNotFoundException($"User '{username}' not found");
+
+        var followers = await _followRepo.GetFollowersAsync(user.Id);
+        return followers.Select(f => f.Follower.ToUserDto()).ToList();
+    }
+
+    public async Task<List<UserDto>> GetFollowingAsync(string username)
+    {
+        var user = await _repo.GetByUsernameAsync(username);
+        if (user is null)
+            throw new KeyNotFoundException($"User '{username}' not found");
+
+        var following = await _followRepo.GetFollowingAsync(user.Id);
+        return following.Select(f => f.Following.ToUserDto()).ToList();
+    }
+
+    public async Task<bool> IsFollowingAsync(Guid followerId, string targetUsername)
+    {
+        var targetUser = await _repo.GetByUsernameAsync(targetUsername);
+        if (targetUser is null)
+            return false;
+
+        return await _followRepo.IsFollowingAsync(followerId, targetUser.Id);
     }
 }

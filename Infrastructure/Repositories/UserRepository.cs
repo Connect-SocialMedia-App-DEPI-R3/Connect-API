@@ -21,7 +21,7 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Id == id);
 
     public Task<User?> GetByUsernameAsync(string username) =>
-        _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+        _context.Users.FirstOrDefaultAsync(u => u.NormalizedUserName == username.ToUpper());
 
     public Task<User?> GetByUsernameWithRelationsAsync(string username) =>
         _context.Users
