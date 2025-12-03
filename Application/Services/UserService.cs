@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Application.DTOs;
 using Application.DTOs.Mappers;
 using Application.Interfaces;
@@ -64,7 +65,7 @@ public class UserService : IUserService
             if (existingUser is not null)
                 throw new InvalidOperationException("Username is already taken.");
 
-            user.UserName = updateDto.Username;
+            await _userManager.SetUserNameAsync(user, updateDto.Username);
         }
 
         // change full name
