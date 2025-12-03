@@ -7,8 +7,7 @@ public class PostSimpleViewDto
     public string Content { get; set; } = string.Empty;
     public string? ImageUrl { get; set; }
     public DateTime CreatedAt { get; set; }
-    public Guid AuthorId { get; set; }
-    public string AuthorUsername { get; set; } = string.Empty;
+    public UserDto Author { get; set; } = null!;
     public int LikeCount { get; set; }
     public int CommentCount { get; set; }
 }

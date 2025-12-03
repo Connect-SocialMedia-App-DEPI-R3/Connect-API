@@ -14,8 +14,7 @@ public static class PostDtoMapper
             Content = post.Content,
             ImageUrl = post.ImageUrl,
             CreatedAt = post.CreatedAt,
-            AuthorId = post.User.Id,
-            AuthorUsername = post.User.UserName ?? string.Empty,
+            Author = post.User.ToUserDto(),
             LikeCount = post.Reactions?.Count ?? 0,
             CommentCount = post.Comments?.Count ?? 0
         };
