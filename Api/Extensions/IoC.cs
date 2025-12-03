@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPostRepository, PostRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<IFollowRepository, FollowRepository>();
+        services.AddScoped<IReactionRepository, ReactionRepository>();
 
         return services;
     }
@@ -29,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPostService, PostService>();
         services.AddScoped<ICommentService, CommentService>();
+        services.AddScoped<IReactionService, ReactionService>();
         services.AddScoped<IImageService, LocalImageService>();
 
         return services;
