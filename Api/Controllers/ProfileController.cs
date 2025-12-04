@@ -25,15 +25,19 @@ public class ProfileController : ControllerBase
     public async Task<ActionResult<UserProfileDto>> GetMyProfile()
     {
         var userId = (Guid)HttpContext.Items["UserId"]!;
-        var profile = await _userService.GetUserProfileAsync(userId);
+        var user = await _userService.GetUserByIdAsync(userId);
+        if (user == null)
+            return NotFound();
+
+        var profile = await _userService.GetUserProfileAsync(user.Username);
         return Ok(profile);
     }
 
-    [HttpGet("{userId}")]
+    [HttpGet("{username}")]
     [AllowAnonymous]
-    public async Task<ActionResult<UserProfileDto>> GetUserProfile(Guid userId)
+    public async Task<ActionResult<UserProfileDto>> GetUserProfile(string username)
     {
-        var profile = await _userService.GetUserProfileAsync(userId);
+        var profile = await _userService.GetUserProfileAsync(username);
         return Ok(profile);
     }
 

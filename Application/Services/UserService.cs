@@ -44,11 +44,12 @@ public class UserService : IUserService
         return new(entity.Id, entity.UserName ?? string.Empty, entity.Email ?? string.Empty, entity.AvatarUrl);
     }
 
-    public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
+    public async Task<UserProfileDto> GetUserProfileAsync(string username)
     {
-        var user = await _repo.GetByIdWithRelationsAsync(userId);
+        // var user = await _repo.GetByIdWithRelationsAsync(userId);
+        var user = await _repo.GetByUsernameWithRelationsAsync(username);
         if (user is null)
-            throw new KeyNotFoundException($"User with ID {userId} not found.");
+            throw new KeyNotFoundException($"User with username {username} not found.");
 
         return user.ToUserProfileDto();
     }
