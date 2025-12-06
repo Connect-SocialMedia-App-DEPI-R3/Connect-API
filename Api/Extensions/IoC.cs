@@ -12,7 +12,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(config.GetConnectionString("SupabaseConnection")));
+            options.UseNpgsql(config.GetConnectionString("SupabaseConnection"), options =>
+            {
+                options.EnableRetryOnFailure();
+            }));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPostRepository, PostRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
