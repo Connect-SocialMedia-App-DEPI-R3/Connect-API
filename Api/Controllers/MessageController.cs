@@ -26,19 +26,8 @@ public class MessageController : ControllerBase
         [FromForm] SendMessageDto dto,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            var message = await _messageService.SendMessageAsync(chatId, userId, dto);
-            return Ok(message);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        var message = await _messageService.SendMessageAsync(chatId, userId, dto);
+        return Ok(message);
     }
 
     // GET /api/chats/{chatId}/messages?page=1&pageSize=50
@@ -50,15 +39,8 @@ public class MessageController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50)
     {
-        try
-        {
-            var messages = await _messageService.GetChatMessagesAsync(chatId, userId, page, pageSize);
-            return Ok(messages);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        var messages = await _messageService.GetChatMessagesAsync(chatId, userId, page, pageSize);
+        return Ok(messages);
     }
 
     // DELETE /api/messages/{messageId}
@@ -68,19 +50,12 @@ public class MessageController : ControllerBase
         Guid messageId,
         [FromQuery] Guid userId)
     {
-        try
+        var result = await _messageService.DeleteMessageAsync(messageId, userId);
+        if (!result)
         {
-            var result = await _messageService.DeleteMessageAsync(messageId, userId);
-            if (!result)
-            {
-                return NotFound("Message not found");
-            }
-            return NoContent();
+            return NotFound("Message not found");
         }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        return NoContent();
     }
 
     // GET /api/chats/{chatId}/unread-count
@@ -90,14 +65,7 @@ public class MessageController : ControllerBase
         Guid chatId,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            var count = await _messageService.GetUnreadCountAsync(userId, chatId);
-            return Ok(count);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        var count = await _messageService.GetUnreadCountAsync(userId, chatId);
+        return Ok(count);
     }
 }

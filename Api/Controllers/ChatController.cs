@@ -26,15 +26,8 @@ public class ChatController : ControllerBase
         Guid targetUserId,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            var chat = await _chatService.CreatePrivateChatAsync(userId, targetUserId);
-            return Ok(chat);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var chat = await _chatService.CreatePrivateChatAsync(userId, targetUserId);
+        return Ok(chat);
     }
 
     // POST /api/chats/group
@@ -44,15 +37,8 @@ public class ChatController : ControllerBase
         [FromBody] CreateGroupChatDto dto,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            var chat = await _chatService.CreateGroupChatAsync(userId, dto);
-            return Ok(chat);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var chat = await _chatService.CreateGroupChatAsync(userId, dto);
+        return Ok(chat);
     }
 
     // GET /api/chats
@@ -71,19 +57,8 @@ public class ChatController : ControllerBase
         Guid chatId,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            var chat = await _chatService.GetChatDetailsAsync(chatId, userId);
-            return Ok(chat);
-        }
-        catch (ArgumentException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        var chat = await _chatService.GetChatDetailsAsync(chatId, userId);
+        return Ok(chat);
     }
 
     // PUT /api/chats/{chatId}/name
@@ -94,19 +69,8 @@ public class ChatController : ControllerBase
         [FromBody] string newName,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            var chat = await _chatService.UpdateGroupNameAsync(chatId, userId, newName);
-            return Ok(chat);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        var chat = await _chatService.UpdateGroupNameAsync(chatId, userId, newName);
+        return Ok(chat);
     }
 
     // DELETE /api/chats/{chatId}
@@ -116,19 +80,12 @@ public class ChatController : ControllerBase
         Guid chatId,
         [FromQuery] Guid userId)
     {
-        try
+        var result = await _chatService.DeleteChatAsync(chatId, userId);
+        if (!result)
         {
-            var result = await _chatService.DeleteChatAsync(chatId, userId);
-            if (!result)
-            {
-                return NotFound("Chat not found");
-            }
-            return NoContent();
+            return NotFound("Chat not found");
         }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        return NoContent();
     }
 
     // POST /api/chats/{chatId}/members
@@ -139,19 +96,8 @@ public class ChatController : ControllerBase
         [FromBody] List<Guid> memberIds,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            await _chatService.AddMembersAsync(chatId, userId, memberIds);
-            return Ok();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        await _chatService.AddMembersAsync(chatId, userId, memberIds);
+        return Ok();
     }
 
     // DELETE /api/chats/{chatId}/members/{memberUserId}
@@ -162,19 +108,8 @@ public class ChatController : ControllerBase
         Guid memberUserId,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            await _chatService.RemoveMemberAsync(chatId, userId, memberUserId);
-            return NoContent();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        await _chatService.RemoveMemberAsync(chatId, userId, memberUserId);
+        return NoContent();
     }
 
     // POST /api/chats/{chatId}/leave
@@ -184,15 +119,8 @@ public class ChatController : ControllerBase
         Guid chatId,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            await _chatService.LeaveGroupAsync(chatId, userId);
-            return NoContent();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        await _chatService.LeaveGroupAsync(chatId, userId);
+        return NoContent();
     }
 
     // PUT /api/chats/{chatId}/members/{memberUserId}/role
@@ -204,18 +132,7 @@ public class ChatController : ControllerBase
         [FromBody] ChatRole newRole,
         [FromQuery] Guid userId)
     {
-        try
-        {
-            await _chatService.UpdateMemberRoleAsync(chatId, userId, memberUserId, newRole);
-            return Ok();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        await _chatService.UpdateMemberRoleAsync(chatId, userId, memberUserId, newRole);
+        return Ok();
     }
 }
