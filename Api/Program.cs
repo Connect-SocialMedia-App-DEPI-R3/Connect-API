@@ -94,7 +94,7 @@ builder.Services.AddCors(options =>
     // CORS for SignalR
     options.AddPolicy("SignalRPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")  // Adjust for your frontend URLs
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://connect-depi.vercel.app")  
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();  // Required for SignalR
