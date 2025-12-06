@@ -24,6 +24,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IChatRepository, ChatRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IChatMemberRepository, ChatMemberRepository>();
+        services.AddScoped<ISellerRepository, SellerRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
 
         return services;
     }
@@ -40,7 +42,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IImageService, LocalImageService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IMessageService, MessageService>();
-
+        services.AddScoped<StripeService>();
+        services.AddScoped<SellerService>();
+        services.AddScoped<ProductService>();
         return services;
     }
 }

@@ -21,6 +21,10 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<Message> Messages { get; set; } = null!;
     public DbSet<ChatMember> ChatMembers { get; set; } = null!;
 
+    // Marketplace
+    public DbSet<Seller> Sellers { get; set; }
+    public DbSet<Product> Products { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
