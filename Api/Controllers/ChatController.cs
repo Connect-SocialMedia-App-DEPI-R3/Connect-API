@@ -23,9 +23,9 @@ public class ChatController : ControllerBase
     [HttpPost("private/{targetUserId:guid}")]
     [ExtractUserId]
     public async Task<ActionResult<ChatDto>> CreatePrivateChat(
-        Guid targetUserId,
-        [FromQuery] Guid userId)
+        Guid targetUserId)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var chat = await _chatService.CreatePrivateChatAsync(userId, targetUserId);
         return Ok(chat);
     }
@@ -34,9 +34,9 @@ public class ChatController : ControllerBase
     [HttpPost("group")]
     [ExtractUserId]
     public async Task<ActionResult<ChatDto>> CreateGroupChat(
-        [FromBody] CreateGroupChatDto dto,
-        [FromQuery] Guid userId)
+        [FromBody] CreateGroupChatDto dto)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var chat = await _chatService.CreateGroupChatAsync(userId, dto);
         return Ok(chat);
     }
@@ -44,8 +44,9 @@ public class ChatController : ControllerBase
     // GET /api/chats
     [HttpGet]
     [ExtractUserId]
-    public async Task<ActionResult<List<ChatDto>>> GetUserChats([FromQuery] Guid userId)
+    public async Task<ActionResult<List<ChatDto>>> GetUserChats()
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var chats = await _chatService.GetUserChatsAsync(userId);
         return Ok(chats);
     }
@@ -54,9 +55,9 @@ public class ChatController : ControllerBase
     [HttpGet("{chatId:guid}")]
     [ExtractUserId]
     public async Task<ActionResult<ChatDetailsDto>> GetChatDetails(
-        Guid chatId,
-        [FromQuery] Guid userId)
+        Guid chatId)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var chat = await _chatService.GetChatDetailsAsync(chatId, userId);
         return Ok(chat);
     }
@@ -66,9 +67,9 @@ public class ChatController : ControllerBase
     [ExtractUserId]
     public async Task<ActionResult<ChatDetailsDto>> UpdateGroupName(
         Guid chatId,
-        [FromBody] string newName,
-        [FromQuery] Guid userId)
+        [FromBody] string newName)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var chat = await _chatService.UpdateGroupNameAsync(chatId, userId, newName);
         return Ok(chat);
     }
@@ -77,9 +78,9 @@ public class ChatController : ControllerBase
     [HttpDelete("{chatId:guid}")]
     [ExtractUserId]
     public async Task<IActionResult> DeleteChat(
-        Guid chatId,
-        [FromQuery] Guid userId)
+        Guid chatId)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var result = await _chatService.DeleteChatAsync(chatId, userId);
         if (!result)
         {
@@ -93,9 +94,9 @@ public class ChatController : ControllerBase
     [ExtractUserId]
     public async Task<IActionResult> AddMembers(
         Guid chatId,
-        [FromBody] List<Guid> memberIds,
-        [FromQuery] Guid userId)
+        [FromBody] List<Guid> memberIds)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         await _chatService.AddMembersAsync(chatId, userId, memberIds);
         return Ok();
     }
@@ -105,9 +106,9 @@ public class ChatController : ControllerBase
     [ExtractUserId]
     public async Task<IActionResult> RemoveMember(
         Guid chatId,
-        Guid memberUserId,
-        [FromQuery] Guid userId)
+        Guid memberUserId)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         await _chatService.RemoveMemberAsync(chatId, userId, memberUserId);
         return NoContent();
     }
@@ -116,9 +117,9 @@ public class ChatController : ControllerBase
     [HttpPost("{chatId:guid}/leave")]
     [ExtractUserId]
     public async Task<IActionResult> LeaveGroup(
-        Guid chatId,
-        [FromQuery] Guid userId)
+        Guid chatId)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         await _chatService.LeaveGroupAsync(chatId, userId);
         return NoContent();
     }
@@ -129,9 +130,9 @@ public class ChatController : ControllerBase
     public async Task<IActionResult> UpdateMemberRole(
         Guid chatId,
         Guid memberUserId,
-        [FromBody] ChatRole newRole,
-        [FromQuery] Guid userId)
+        [FromBody] ChatRole newRole)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         await _chatService.UpdateMemberRoleAsync(chatId, userId, memberUserId, newRole);
         return Ok();
     }

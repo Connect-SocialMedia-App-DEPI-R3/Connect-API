@@ -23,9 +23,9 @@ public class MessageController : ControllerBase
     [ExtractUserId]
     public async Task<ActionResult<MessageDto>> SendMessage(
         Guid chatId,
-        [FromForm] SendMessageDto dto,
-        [FromQuery] Guid userId)
+        [FromForm] SendMessageDto dto)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var message = await _messageService.SendMessageAsync(chatId, userId, dto);
         return Ok(message);
     }
@@ -35,10 +35,10 @@ public class MessageController : ControllerBase
     [ExtractUserId]
     public async Task<ActionResult<List<MessageDto>>> GetChatMessages(
         Guid chatId,
-        [FromQuery] Guid userId,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var messages = await _messageService.GetChatMessagesAsync(chatId, userId, page, pageSize);
         return Ok(messages);
     }
@@ -47,9 +47,9 @@ public class MessageController : ControllerBase
     [HttpDelete("/api/messages/{messageId:guid}")]
     [ExtractUserId]
     public async Task<IActionResult> DeleteMessage(
-        Guid messageId,
-        [FromQuery] Guid userId)
+        Guid messageId)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var result = await _messageService.DeleteMessageAsync(messageId, userId);
         if (!result)
         {
@@ -62,9 +62,9 @@ public class MessageController : ControllerBase
     [HttpGet("/api/chats/{chatId:guid}/unread-count")]
     [ExtractUserId]
     public async Task<ActionResult<int>> GetUnreadCount(
-        Guid chatId,
-        [FromQuery] Guid userId)
+        Guid chatId)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
         var count = await _messageService.GetUnreadCountAsync(userId, chatId);
         return Ok(count);
     }
