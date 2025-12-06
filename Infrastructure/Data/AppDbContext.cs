@@ -15,6 +15,11 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<Comment> Comments { get; set; } = null!;
     public DbSet<Reaction> Reactions { get; set; } = null!;
     public DbSet<Follow> Follows { get; set; } = null!;
+    
+    // Chat
+    public DbSet<Chat> Chats { get; set; } = null!;
+    public DbSet<Message> Messages { get; set; } = null!;
+    public DbSet<ChatMember> ChatMembers { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -63,5 +68,38 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
             .WithMany(u => u.Followers)
             .HasForeignKey(f => f.FollowingId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Chat: Chat -> Messages (one-to-many, cascade delete)
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Chat)
+            .WithMany(c => c.Messages)
+            .HasForeignKey(m => m.ChatId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Chat: User -> Messages (one-to-many, cascade delete)
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Sender)
+            .WithMany(u => u.Messages)
+            .HasForeignKey(m => m.SenderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Chat: Chat -> ChatMembers (one-to-many, cascade delete)
+        modelBuilder.Entity<ChatMember>()
+            .HasOne(cm => cm.Chat)
+            .WithMany(c => c.Members)
+            .HasForeignKey(cm => cm.ChatId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Chat: User -> ChatMembers (one-to-many, cascade delete)
+        modelBuilder.Entity<ChatMember>()
+            .HasOne(cm => cm.User)
+            .WithMany(u => u.ChatMembers)
+            .HasForeignKey(cm => cm.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Chat: Unique constraint for ChatMember (one user can't be in same chat twice)
+        modelBuilder.Entity<ChatMember>()
+            .HasIndex(cm => new { cm.ChatId, cm.UserId })
+            .IsUnique();
     }
 }

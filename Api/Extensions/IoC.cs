@@ -18,6 +18,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<IFollowRepository, FollowRepository>();
         services.AddScoped<IReactionRepository, ReactionRepository>();
+        services.AddScoped<IChatRepository, ChatRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IChatMemberRepository, ChatMemberRepository>();
 
         return services;
     }
@@ -32,6 +35,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICommentService, CommentService>();
         services.AddScoped<IReactionService, ReactionService>();
         services.AddScoped<IImageService, LocalImageService>();
+        services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<IMessageService, MessageService>();
 
         return services;
     }
