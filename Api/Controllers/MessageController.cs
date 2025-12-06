@@ -2,7 +2,9 @@ using Application.DTOs;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Api.Filters;
+using Api.Hubs;
 
 namespace Api.Controllers;
 
@@ -12,10 +14,12 @@ namespace Api.Controllers;
 public class MessageController : ControllerBase
 {
     private readonly IMessageService _messageService;
+    private readonly IHubContext<ChatHub> _hubContext;
 
-    public MessageController(IMessageService messageService)
+    public MessageController(IMessageService messageService, IHubContext<ChatHub> hubContext)
     {
         _messageService = messageService;
+        _hubContext = hubContext;
     }
 
     // POST /api/chats/{chatId}/messages
@@ -27,6 +31,10 @@ public class MessageController : ControllerBase
     {
         var userId = (Guid)HttpContext.Items["UserId"]!;
         var message = await _messageService.SendMessageAsync(chatId, userId, dto);
+                    // Broadcast message via SignalR
+        await _hubContext.Clients.Group(chatId.ToString())
+            .SendAsync("ReceiveMessage", message);
+            
         return Ok(message);
     }
 
@@ -50,11 +58,19 @@ public class MessageController : ControllerBase
         Guid messageId)
     {
         var userId = (Guid)HttpContext.Items["UserId"]!;
-        var result = await _messageService.DeleteMessageAsync(messageId, userId);
-        if (!result)
+        var (success, chatId) = await _messageService.DeleteMessageAsync(messageId, userId);
+        if (!success)
         {
             return NotFound("Message not found");
         }
+
+        // Broadcast deletion via SignalR
+        if (chatId.HasValue)
+        {
+            await _hubContext.Clients.Group(chatId.Value.ToString())
+                .SendAsync("MessageDeleted", messageId);
+        }
+        
         return NoContent();
     }
 

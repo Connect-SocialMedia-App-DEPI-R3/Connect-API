@@ -89,12 +89,12 @@ public class MessageService : IMessageService
         return messages.Select(m => m.ToMessageDto()).ToList();
     }
 
-    public async Task<bool> DeleteMessageAsync(Guid messageId, Guid userId)
+    public async Task<(bool Success, Guid? ChatId)> DeleteMessageAsync(Guid messageId, Guid userId)
     {
         var message = await _messageRepository.GetByIdAsync(messageId);
         if (message == null)
         {
-            return false;
+            return (false, null);
         }
 
         // Only sender can delete their message
@@ -103,9 +103,10 @@ public class MessageService : IMessageService
             throw new UnauthorizedAccessException("You can only delete your own messages");
         }
 
+        var chatId = message.ChatId;
         await _messageRepository.DeleteAsync(message);
         await _messageRepository.SaveChangesAsync();
-        return true;
+        return (true, chatId);
     }
 
     public async Task<int> GetUnreadCountAsync(Guid userId, Guid chatId)
