@@ -16,4 +16,8 @@ public class User : IdentityUser<Guid>
     public List<Reaction>? Reactions { get; set; } = new List<Reaction>();
     public List<Follow>? Followers { get; set; } = new List<Follow>();
     public List<Follow>? Following { get; set; } = new List<Follow>();
+    
+    // Chat
+    public List<Message>? Messages { get; set; } = new List<Message>();
+    public List<ChatMember>? ChatMembers { get; set; } = new List<ChatMember>();
 }

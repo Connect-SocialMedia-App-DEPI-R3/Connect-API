@@ -45,6 +45,23 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
         )
     };
+    
+    // Configure JWT for SignalR
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
+            {
+                context.Token = accessToken;
+            }
+            
+            return Task.CompletedTask;
+        }
+    };
 });
 
 
@@ -55,6 +72,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 // Services (Application)
 builder.Services.AddApplication();
+
+// SignalR
+builder.Services.AddSignalR();
 
 // Filters
 builder.Services.AddScoped<ExtractUserIdFilter>();
@@ -69,6 +89,15 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin()     // frontend dev
               .AllowAnyHeader()
               .AllowAnyMethod();
+    });
+    
+    // CORS for SignalR
+    options.AddPolicy("SignalRPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")  // Adjust for your frontend URLs
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();  // Required for SignalR
     });
 });
 
@@ -86,10 +115,11 @@ app.UseGlobalExceptionHandler();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseCors("AllowFrontend");
+app.UseCors("SignalRPolicy");  // Use SignalR CORS policy
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<Api.Hubs.ChatHub>("/chatHub");
 
 // seed database
 using (var scope = app.Services.CreateScope())
