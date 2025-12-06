@@ -25,25 +25,12 @@ namespace Application.Services
             var options = new AccountCreateOptions
             {
                 Type = "express",
-                Email = email,
-                Capabilities = new AccountCapabilitiesOptions
-                {
-                    CardPayments = new AccountCapabilitiesCardPaymentsOptions
-                    {
-                        Requested = true   // 🔹 يطلب تمكين الدفع بالبطاقات
-                    },
-                    Transfers = new AccountCapabilitiesTransfersOptions
-                    {
-                        Requested = true   // 🔹 يطلب تمكين التحويلات للبائع
-                    }
-                }
+                Email = email
             };
-
             var service = new AccountService();
             var account = await service.CreateAsync(options);
             return account.Id; // هذا الـ StripeAccountId
         }
-
 
         // لإنشاء رابط onboarding للمستخدم
         public string CreateAccountLink(string stripeAccountId)
@@ -51,8 +38,8 @@ namespace Application.Services
             var options = new AccountLinkCreateOptions
             {
                 Account = stripeAccountId,
-                RefreshUrl = "https://connect-depi.vercel.app/",
-                ReturnUrl = "https://connect-depi.vercel.app/",
+                RefreshUrl = "https://connect-depi.vercel.app/market",
+                ReturnUrl = "https://connect-depi.vercel.app/market",
                 Type = "account_onboarding"
             };
             var service = new AccountLinkService();
@@ -84,8 +71,8 @@ namespace Application.Services
             }
         },
                 Mode = "payment",
-                SuccessUrl = "https://connect-depi.vercel.app/",
-                CancelUrl = "https://connect-depi.vercel.app/"
+                SuccessUrl = "https://connect-depi.vercel.app/market",
+                CancelUrl = "https://connect-depi.vercel.app/market"
             };
 
             var service = new SessionService();
