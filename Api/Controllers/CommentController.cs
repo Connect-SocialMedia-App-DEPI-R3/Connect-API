@@ -47,7 +47,7 @@ public class CommentController : ControllerBase
         var userId = (Guid)HttpContext.Items["UserId"]!;
 
         var comment = await _commentService.CreateCommentAsync(commentCreateDto, postId, userId);
-        return CreatedAtAction(nameof(GetCommentById), new { postId, id = comment.Id }, comment);
+        return Ok(comment);
     }
 
     // PUT: api/posts/{postId}/comments/{id}
