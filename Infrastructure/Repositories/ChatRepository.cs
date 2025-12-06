@@ -29,9 +29,8 @@ public class ChatRepository : IChatRepository
 
     public async Task<List<Chat>> GetUserChatsAsync(Guid userId)
     {
-        return await _context.ChatMembers
-            .Where(cm => cm.UserId == userId)
-            .Select(cm => cm.Chat)
+        return await _context.Chats
+            .Where(c => c.Members.Any(m => m.UserId == userId))
             .Include(c => c.Members)
                 .ThenInclude(m => m.User)
             .Include(c => c.Messages.OrderByDescending(m => m.CreatedAt).Take(1))
